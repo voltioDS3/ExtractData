@@ -1,4 +1,4 @@
-from __future__ import division, print_function
+
 from riotwatcher import LolWatcher, ApiError
 import pandas as pd
 import time
