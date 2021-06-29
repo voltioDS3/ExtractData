@@ -177,7 +177,7 @@ class DataLeague:
                         continue
                     else:
                         print('[error] players')
-                        keyboard.wait('ctrl+alt+`')
+                        a = input('type something and enter to continue')
                         self.change_key()
                 break
     
@@ -193,7 +193,7 @@ class DataLeague:
                         continue
                     else:
                         print('[error] puuid')
-                        keyboard.wait('ctrl+alt+`')
+                        a = input('type something and enter to continue')
                         self.change_key()
                 break
 
@@ -209,7 +209,7 @@ class DataLeague:
                         continue
                     else:
                         print('[error] matches')
-                        keyboard.wait('ctrl+alt+`')
+                        a = input('type something and enter to continue')
                         self.change_key()
                         
                 break
