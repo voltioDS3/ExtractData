@@ -54,9 +54,10 @@ class DataLeague:
         self.folder_name = self.REGION + "_DATA"
         self.csv_name = self.REGION + "_DATA.csv"
         self.recovery_name = self.REGION + "_RECOVERY.txt"
-        with open('./api_key.txt', 'r') as f:
+        with open('api_key.txt', 'r+') as f:
             key = f.read()
             self.lol_watcher = LolWatcher(key)
+            f.close()
         if not os.path.isdir(self.folder_name):
             os.mkdir(self.folder_name)
         
@@ -75,17 +76,19 @@ class DataLeague:
             self.lol_data = pd.read_csv(self.csv_name)
     
     def change_key(self):
-        with open('./api_key.txt', 'r') as f:
+        with open('api_key.txt', 'r+') as f:
             key = f.read()
             self.lol_watcher = LolWatcher(key)
+            f.close()
     
     def check(self):
             if keyboard.is_pressed('ctrl+alt+0'):
                 print('time to change the key, please, DO NOTPRESS ESC AND EDIT THE FILE WITH THE API KEY ON IT')
                 keyboard.wait('esc')
-                with open('api_key.txt', 'r') as f:
+                with open('api_key.txt', 'r+') as f:
                     key = f.read()
                     self.lol_watcher = LolWatcher(key)
+                    f.close()
                 time.sleep(10)
 
     def get_data(self):
@@ -146,9 +149,9 @@ class DataLeague:
                                           
                                             aux_df = pd.DataFrame(league_data, index=['championId'])
                                             self.lol_data = self.lol_data.append(aux_df, ignore_index=True)
-                                            print(league_data)
+                                            # print(league_data)
                                             league_data.clear()
-                                            print(f'{league_data} this is after the clear')
+                                            # print(f'{league_data} this is after the clear')
                                             
                                             self.check()
                                         except Exception:
@@ -166,7 +169,7 @@ class DataLeague:
                                     pass                  
                                 
                                     
-
+                                    
     def get_players(self, tier, division, page):
         while True:
             for i in range(DataLeague.tries):
