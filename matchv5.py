@@ -46,7 +46,7 @@ class DataLeague:
     'lane': [0],
     'win': [0],
 }
-    tries = 3
+    tries = 5
     def __init__(self, PAGES, REGION):
         self.PAGES = PAGES
         self.REGION = REGION
@@ -111,7 +111,7 @@ class DataLeague:
                                 if match_data != False:
                                     self.check()
                                     for participant in match_data['participants']:
-                                        print(participant['championName'])
+                                        # print(participant['championName'])
                                         perks = participant['perks']
                                         styles = perks['styles']
                                         perks = []
@@ -146,14 +146,16 @@ class DataLeague:
                                           
                                             aux_df = pd.DataFrame(league_data, index=['championId'])
                                             self.lol_data = self.lol_data.append(aux_df, ignore_index=True)
-                                            
+                                            print(league_data)
+                                            league_data.clear()
+                                            print(f'{league_data} this is after the clear')
                                             
                                             self.check()
                                         except Exception:
                                             print('passing because list out of index')
                                             pass
                                     DataLeague.x += 1
-                                    if DataLeague.x == 5:
+                                    if DataLeague.x == 50:
                                         self.lol_data.to_csv(self.csv_name, index=False)
                                         DataLeague.x = 0
                                         print('writted after 5')
