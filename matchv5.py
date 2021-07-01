@@ -54,10 +54,9 @@ class DataLeague:
         self.folder_name = self.REGION + "_DATA"
         self.csv_name = self.REGION + "_DATA.csv"
         self.recovery_name = self.REGION + "_RECOVERY.txt"
-        with open('api_key.txt', 'r+') as f:
-            key = f.read()
-            self.lol_watcher = LolWatcher(key)
-            f.close()
+        file = open("api_key.txt", "r")
+        self.lol_watcher = LolWatcher(file.readline(0))
+        file.close
         if not os.path.isdir(self.folder_name):
             os.mkdir(self.folder_name)
         
@@ -76,10 +75,9 @@ class DataLeague:
             self.lol_data = pd.read_csv(self.csv_name)
     
     def change_key(self):
-        with open('api_key.txt', 'r+') as f:
-            key = f.read()
-            self.lol_watcher = LolWatcher(key)
-            f.close()
+        file = open("api_key.txt", "r")
+        self.lol_watcher = LolWatcher(file.readline(0))
+        file.close()
     
     def check(self):
             if keyboard.is_pressed('ctrl+alt+0'):
@@ -183,6 +181,7 @@ class DataLeague:
                     else:
                         print('[error] players')
                         a = input('type something and enter to continue')
+                        
                         self.change_key()
                 break
     
@@ -199,6 +198,7 @@ class DataLeague:
                     else:
                         print('[error] puuid')
                         a = input('type something and enter to continue')
+                        
                         self.change_key()
                 break
 
@@ -215,6 +215,7 @@ class DataLeague:
                     else:
                         print('[error] matches')
                         a = input('type something and enter to continue')
+                        
                         self.change_key()
                         
                 break
@@ -231,6 +232,7 @@ class DataLeague:
                         continue
                     else:
                         print('[error] match_data')
+                        
                         
                         self.change_key()
                         return False
