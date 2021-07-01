@@ -54,9 +54,11 @@ class DataLeague:
         self.folder_name = self.REGION + "_DATA"
         self.csv_name = self.REGION + "_DATA.csv"
         self.recovery_name = self.REGION + "_RECOVERY.txt"
-        file = open("api_key.txt", "r")
-        self.lol_watcher = LolWatcher(file.readline(0))
-        file.close
+        with open('api_key.txt') as f:
+            contents = f.readlines()
+            self.lol_watcher = LolWatcher(contents)
+            print(contents)
+            
         if not os.path.isdir(self.folder_name):
             os.mkdir(self.folder_name)
         
@@ -76,7 +78,8 @@ class DataLeague:
     
     def change_key(self):
         file = open("api_key.txt", "r")
-        self.lol_watcher = LolWatcher(file.readline(0))
+        self.lol_watcher = LolWatcher(file.read())
+        print(file.read())
         file.close()
     
     def check(self):
