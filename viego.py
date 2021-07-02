@@ -25,4 +25,4 @@ class LolViego:
             for game in game_list:
                 def_game_id.append(game.replace('"',''))
             return def_game_id
-        else: return None
+        else: raise Exception
