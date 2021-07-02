@@ -4,7 +4,7 @@ import pandas as pd
 import time
 import keyboard
 import os
-
+from viego import LolViego
 # first do a entries like normal and get the summoner id
 # then with the summoner id do a summoner.by encrypted summoner id, and get de puuid
 
@@ -57,6 +57,7 @@ class DataLeague:
         with open('api_key.txt') as f:
             contents = f.readline()
             self.lol_watcher = LolWatcher(api_key=contents)
+            self.viego = LolViego(api_key=contents)
             print(contents)
 
         if not os.path.isdir(self.folder_name):
@@ -80,6 +81,7 @@ class DataLeague:
         with open('api_key.txt') as f:
             contents = f.readline()
             self.lol_watcher = LolWatcher(api_key=contents)
+            self.viego = LolViego(api_key=contents)
             print(contents)
     
     def check(self):
@@ -110,6 +112,7 @@ class DataLeague:
                         matches = self.get_matches(puuid=puuid)
 
                         for match in matches:
+                                print(match)
                                 self.check()
                                 match_data = self.get_match_info(match)
                                 if match_data != False:
@@ -143,7 +146,7 @@ class DataLeague:
                                                 'perk3': [perks[3]],
                                                 'perk4': [perks[4]],
                                                 'perk5': [perks[5]],
-                                                'role': [participant['role']],
+                                                'role': [participant['individualPosition']],
                                                 'lane': [participant['lane']],
                                                 'win': [participant['win']],
                                                             }
@@ -193,6 +196,7 @@ class DataLeague:
             for i in range(DataLeague.tries):
                 try:
                     puuid = self.lol_watcher.summoner.by_id(region=self.REGION, encrypted_summoner_id=summoner_id)['puuid']
+                    print(puuid)
                     print('[succes] puuid')
                     return puuid
                 except Exception:
@@ -209,7 +213,8 @@ class DataLeague:
         while True:
             for i in range(DataLeague.tries):
                 try:
-                    matches = self.lol_watcher.matchv5.matchlist_by_puuid(region=self.REGION_NAME, puuid=puuid)
+                    # matches = self.lol_watcher.matchv5.matchlist_by_puuid(region=self.REGION_NAME, puuid=puuid)
+                    matches = self.viego.matchv5_matchlist(region=self.REGION_NAME,puuid=puuid,queue=420,type='ranked')
                     print('[succes] matches')
                     return matches
                 except Exception:
