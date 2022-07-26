@@ -1,17 +1,32 @@
+from argparse import RawDescriptionHelpFormatter
+from email.policy import HTTP
 from time import process_time_ns
+import time
+from urllib import response
 import requests
+import json
 from requests.exceptions import HTTPError
+class BLANKError(Exception):
+    """Base class for other exceptions"""
+    pass
+
+class IDError(Exception):
+    """Base class for other exceptions"""
+    pass
+
+
+
 
 
 class LolViego:
     #the idea of this module is that , whatever tier or division you add, it will continue all the way from that specific division to diamond I or IV idk yet
-    DIVISION_MAPPING = {
-        'GOLD' : ['GOLD', 'PLATINUM', 'DIAMOND'],
-        'PLATINUM' : ['PLATINUM', 'DIAMOND'],
+    TIER_MAPPING = {
+        'GOLD' : ['DIAMOND', 'PLATINUM', 'GOLD' ],
+        'PLATINUM' : ['DIAMOND', 'PLATINUM'],
         'DIAMOND' : ['DIAMOND']
     }
 
-    TIER_MAPPING = {
+    DIVISION_MAPPING = {
         'IV' : ['IV', 'III', 'II', 'I'],
         'III': ['III', 'II', 'I'],
         'II' : ['II', 'I'],
@@ -19,27 +34,84 @@ class LolViego:
 
     }
 
-    PAGES_MAPPING ={
-
+    CONTINENTS_MAPPING ={
+        'br1': 'americas',
+        'eun1' : 'europe',
+        'euw1' : 'europe',
+        'jp1': 'asia',
+        'kr' : 'asia',
+        'la1' : 'americas',
+        'la2' : 'americas',
+        'na1' : 'americas',
+        'oc1' : 'sea',
+        'ru'  : 'europe'
     }
 
-    def __init__(self, api_key, division, tier, region, page):
+    def __init__(self, api_key,region, division, tier, page):
         self.api_key = api_key
         self.division_list = LolViego.DIVISION_MAPPING[division]
         self.tier_list = LolViego.TIER_MAPPING[tier]
         self.page_list = [x for x in range(page, 10000)]
+        self.region = region #BR1, EUN1, EUW1, JP1, KR, LA1, LA2, NA1, OC1, RU
+        self.region_continent = LolViego.CONTINENTS_MAPPING[region]
+        self.api_key = api_key
+        
+    def get_data(self):  #this is for getting a list of players by tier, i will start at platinum and beyond 
+        
+        
+        for division in self.division_list:
+            for tier in self.tier_list:
+                for page in self.page_list:
+                    # print(tier)
+                    # print(division)
+                    # print(page)
+                    players_entries = self.leaguev4_get_entries(tier,division,page)
+                    for player in players_entries:
+                        summoner_id = player['summonerId']
+                        puuid = self.summonerv4_get_summoner_by_id(summoner_id)
+                        print(f'puuid is {puuid}')
+                        
 
-        self.current_division
-    def leaguev4_player_entries(self, region, queue= 'RANKED_SOLO_5X5', tier= 'GOLD', divisions = ['IV', 'III', 'II', 'I'], page = [x for x in range(1, 10000)]): #this is for getting a list of players by tier, i will start at platinum and beyond 
-        if type(divisions) is list:
-            if type(page) is list:
-                for division in divisions:
-
-                    url = f'https://{region.lower()}.api.riotgames.com/lol/league/v4/entries/{queue}/DIAMOND/I?page=2&api_key=RGAPI-6790ab72-f889-4fe8-9129-fc969dccdc1f'
-        pass
 
 
-    def matchv5_matchlist(self,region,puuid,queue,type,start=0,count=20): # this is matches by puuid amd returns a list of ids with 
+    def leaguev4_get_entries(self,tier, division, page):  #returns a list with player info from differents soloq rankeds
+     
+        url = f'https://{self.region}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/{tier}/{division}?page={page}&api_key={self.api_key}'
+        
+        try:
+            response = requests.get(url)
+            
+            if len(response.json()) == 0:  #  means there was an empty response
+                raise BLANKError
+            print(f'[success] entries gotten')
+            return response.json()
+
+        except HTTPError as http_err:  #  some serious error like no internet, server error, bad url ec
+            print(f'[error] HTTP ERROR OCCURRED(SERIOUS): {http_err}')
+            pass
+        
+        except BLANKError as blank:  #  response was blank, which could mean that we have reached last page
+            print('[error] response was empty, likely last page')
+            pass
+
+
+    def summonerv4_get_summoner_by_id(self, summoner_id):
+
+        url = f'https://{self.region}.api.riotgames.com/lol/summoner/v4/summoners/{summoner_id}?api_key={self.api_key}'
+        try:
+            response = requests.get(url)
+
+            if response.status_code == 400:
+                raise IDError()
+            print(f'[success] puuid gotten')
+            return response.json()['puuid']
+        except IDError as id_error:
+            print('[error] id not found or other error')
+            pass
+
+
+
+    def matchv5_matchlist(self,region,puuid,queue,type,start=0,count=20):  # this is matches by puuid amd returns a list of ids with 
         def_game_id = []
         if region == 'AMERICAS':
             url = f'https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue}&type={type}&start={start}&count={count}&api_key={self.api_key}'
@@ -49,7 +121,7 @@ class LolViego:
             url = f'https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue}&type={type}&start={start}&count={count}&api_key={self.api_key}'
         response = requests.get(url)
 
-        print(response)
+        print(response.json())
         if response.status_code == 200:
             game_ids = response.text
             game_list = game_ids.strip('][').split(',')
@@ -57,3 +129,7 @@ class LolViego:
                 def_game_id.append(game.replace('"',''))
             return def_game_id
         else: raise Exception
+
+
+america = LolViego('RGAPI-c74d120c-a58a-4e1a-9b65-718e895e7793', 'na1', 'I','DIAMOND', 1)
+america.get_data()
