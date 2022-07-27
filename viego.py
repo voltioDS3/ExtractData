@@ -138,18 +138,20 @@ class LolViego:
         for division in self.division_list:
             for tier in self.tier_list:
                 for page in self.page_list:
-                    time.sleep(1.2)
+                    
                     # print(tier)
                     # print(division)
                     # print(page)
                     players_entries = self.leaguev4_get_entries(tier, division, page)
-                    time.sleep(1.2)
+                    
                     self.requests  +=1
                     for player in players_entries:
                         summoner_id = player["summonerId"]
                         puuid = self.summonerv4_get_summoner_by_id(summoner_id)
+                        time.sleep(1)
                         self.requests  +=1
                         matches = self.matchv5_matchlist(puuid)
+                        time.sleep(1)
                         self.requests  +=1
                         # print(matches)
                         # print(puuid)
@@ -158,8 +160,10 @@ class LolViego:
                         try:
 
                             for match in matches:
+                                time.sleep(0.5)
                                 # print(match)
                                 match_info = self.matchv5_match_info(match)
+                                time.sleep(1)
                                 self.requests  +=1
                                 print(f'this is request n{self.requests}')
                                 for participant in match_info["participants"]:
