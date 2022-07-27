@@ -14,6 +14,10 @@ class IDError(Exception):
     """Base class for other exceptions"""
     pass
 
+class MATCHESError(Exception):
+    """Base class for other exceptions"""
+    pass
+
 
 
 
@@ -69,7 +73,13 @@ class LolViego:
                     for player in players_entries:
                         summoner_id = player['summonerId']
                         puuid = self.summonerv4_get_summoner_by_id(summoner_id)
-                        print(f'puuid is {puuid}')
+                        matches = self.matchv5_matchlist(puuid)
+                        # print(puuid)
+                        # print(games)
+                        for match in matches:
+                            match_info = self.matchv5_match_info()
+                            
+
                         
 
 
@@ -100,35 +110,47 @@ class LolViego:
         url = f'https://{self.region}.api.riotgames.com/lol/summoner/v4/summoners/{summoner_id}?api_key={self.api_key}'
         try:
             response = requests.get(url)
-
+            
             if response.status_code == 400:
-                raise IDError()
+                raise IDError
             print(f'[success] puuid gotten')
             return response.json()['puuid']
+
+        except HTTPError as http_err:  #  some serious error like no internet, server error, bad url ec
+            print(f'[error] HTTP ERROR OCCURRED(SERIOUS): {http_err}')
+            pass
+
         except IDError as id_error:
             print('[error] id not found or other error')
             pass
 
 
 
-    def matchv5_matchlist(self,region,puuid,queue,type,start=0,count=20):  # this is matches by puuid amd returns a list of ids with 
-        def_game_id = []
-        if region == 'AMERICAS':
-            url = f'https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue}&type={type}&start={start}&count={count}&api_key={self.api_key}'
-        elif region == 'EUROPE':
-            url = f'https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue}&type={type}&start={start}&count={count}&api_key={self.api_key}'
-        elif region == 'ASIA':
-            url = f'https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue}&type={type}&start={start}&count={count}&api_key={self.api_key}'
-        response = requests.get(url)
+    def matchv5_matchlist(self,puuid, count=40 ):  # this is matches by puuid amd returns a list of ids with 
+        start_time = int(time.time()) - 604800*2  # two weeks from today
+        
+        # url = f'https://{self.region_continent}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue=420&type=ranked&endTime={end_time}&count={count}&api_key={self.api_key}'
+        url = f'https://{self.region_continent}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?startTime={start_time}&endTime={int(time.time())}&queue=420&type=ranked&start=0&count={count}&api_key={self.api_key}'
+        try:
+            response = requests.get(url)
+            print(response.status_code)
+            
+            if len(response.json()) == 0:
+                print('[warning] did not found recent games')
+                return
+            if response.status_code != 200:
+                raise MATCHESError
+            
+            return response.json()
 
-        print(response.json())
-        if response.status_code == 200:
-            game_ids = response.text
-            game_list = game_ids.strip('][').split(',')
-            for game in game_list:
-                def_game_id.append(game.replace('"',''))
-            return def_game_id
-        else: raise Exception
+        except HTTPError as http_err:  #  some serious error like no internet, server error, bad url ec
+            print(f'[error] HTTP ERROR OCCURRED(SERIOUS): {http_err}')
+            pass
+
+        except MATCHESError() as match_error:
+            print('[error] matches id ')
+            pass
+
 
 
 america = LolViego('RGAPI-c74d120c-a58a-4e1a-9b65-718e895e7793', 'na1', 'I','DIAMOND', 1)
