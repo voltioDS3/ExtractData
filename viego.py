@@ -148,6 +148,8 @@ class LolViego:
                     for player in players_entries:
                         summoner_id = player["summonerId"]
                         puuid = self.summonerv4_get_summoner_by_id(summoner_id)
+                        if type(puuid) is NoneType:
+                            break
                         time.sleep(1)
                         self.requests  +=1
                         matches = self.matchv5_matchlist(puuid)
@@ -160,10 +162,10 @@ class LolViego:
                         try:
 
                             for match in matches:
-                                time.sleep(0.5)
+                                time.sleep(0.25)
                                 # print(match)
                                 match_info = self.matchv5_match_info(match)
-                                time.sleep(1)
+                                
                                 self.requests  +=1
                                 print(f'this is request n{self.requests}')
                                 for participant in match_info["participants"]:
@@ -255,7 +257,9 @@ class LolViego:
             if response.status_code == 400:
                 raise IDError
             print(f"[success] puuid gotten")
-            # print(response.json()["puuid"])
+            print(response.json())
+            if response.status_code == 500:
+                return
             return response.json()["puuid"]
 
         except HTTPError as http_err:  #  some serious error like no internet, server error, bad url ec
@@ -265,6 +269,8 @@ class LolViego:
         except IDError:
             print("[error] id not found or other error")
             pass
+        except TypeError:
+            print('error with the summonerv4 get summoner by id')
 
     def matchv5_matchlist(
         self, puuid, count=40
