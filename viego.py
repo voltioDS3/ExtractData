@@ -143,16 +143,43 @@ class LolViego:
                     # print(division)
                     # print(page)
                     players_entries = self.leaguev4_get_entries(tier, division, page)
+                    if type(players_entries) is NoneType:
+                        print('retrying in 1s')
+                        time.sleep(1)
+                        players_entries = self.leaguev4_get_entries(tier, division, page)
+                        if type(players_entries) is not NoneType:
+                            pass
+                        else:
+                            print('breaking')
+                            continue
+
                     
                     self.requests  +=1
                     for player in players_entries:
                         summoner_id = player["summonerId"]
                         puuid = self.summonerv4_get_summoner_by_id(summoner_id)
                         if type(puuid) is NoneType:
-                            break
+                            print('retrying in 1s')
+                            time.sleep(1)
+                            puuid = self.summonerv4_get_summoner_by_id(summoner_id)
+                            if type(puuid) is not NoneType:
+                                pass
+                            else:
+                                print('breaking')
+                                continue
                         time.sleep(1)
                         self.requests  +=1
                         matches = self.matchv5_matchlist(puuid)
+
+                        if type(matches) is NoneType:
+                            print('retrying in 1s')
+                            time.sleep(1)
+                            matches = self.matchv5_matchlist(puuid)
+                            if type(matches) is not NoneType:
+                                pass
+                            else:
+                                print('breaking')
+                                continue
                         time.sleep(1)
                         self.requests  +=1
                         # print(matches)
@@ -165,6 +192,16 @@ class LolViego:
                                 time.sleep(0.25)
                                 # print(match)
                                 match_info = self.matchv5_match_info(match)
+                                if type(match_info) is NoneType:
+                                    print('retrying in 1s')
+                                    time.sleep(1)
+                                    match_info = self.matchv5_match_info(match)
+                                    if type(match_info) is not NoneType:
+                                        pass
+                                    else:
+                                        print('breaking')
+                                        continue
+                                   
                                 
                                 self.requests  +=1
                                 print(f'this is request n{self.requests}')
@@ -244,6 +281,13 @@ class LolViego:
             print(f"[error] HTTP ERROR OCCURRED(SERIOUS): {http_err}")
             pass
 
+        except requests.exceptions.ConnectionError as e:
+            return 
+            pass
+        except Exception as e:
+            return
+            pass
+    
         except BLANKError:  #  response was blank, which could mean that we have reached last page
             print("[error] response was empty, likely last page")
             pass
@@ -272,6 +316,13 @@ class LolViego:
         except TypeError:
             print('error with the summonerv4 get summoner by id')
 
+        except requests.exceptions.ConnectionError as e:
+            return 
+            pass
+        except Exception as e:
+            return
+            pass
+
     def matchv5_matchlist(
         self, puuid, count=40
     ):  # this is matches by puuid amd returns a list of ids with
@@ -298,6 +349,13 @@ class LolViego:
             print("[error] matches id ")
             pass
 
+        except requests.exceptions.ConnectionError as e:
+            return 
+            pass
+        except Exception as e:
+            return
+            pass
+
     def matchv5_match_info(self, match_id):
         url = f"https://{self.region_continent}.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={self.api_key}"
         try:
@@ -313,6 +371,13 @@ class LolViego:
 
         except HTTPError as http_err:  #  some serious error like no internet, server error, bad url ec
             print(f"[error] HTTP ERROR OCCURRED(SERIOUS): {http_err}")
+            pass
+
+        except requests.exceptions.ConnectionError as e:
+            return 
+            pass
+        except Exception as e:
+            return
             pass
 
 
