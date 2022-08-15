@@ -82,8 +82,11 @@ class Canvas:
         self.find_boots()
         self.find_spells()
         if rol is None:
+            self.canvas.thumbnail((1024,768)) # reduce image quality for sizing reasons
             self.canvas.save('./all_info/' + 'popular_' + str(self.champion) + '.png')
         else:
+          
+            self.canvas.thumbnail((1024,768)) # # reduce image quality for sizing reasons
             self.canvas.save('./all_info/' + 'popular_' + str(self.champion) + '_' + rol + '.png')
 
     def find_runes(self):
