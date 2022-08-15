@@ -1,3 +1,5 @@
 *_data/
 __pycache__/
+img/
+analize/all_info/
 api_key.txt

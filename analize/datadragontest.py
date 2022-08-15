@@ -9,11 +9,11 @@ import sys, getopt
 
 with open('../api_key.txt', 'r') as f:
     key = f.readlines()
-    data_watcher = LolWatcher(key)
-VERSION = data_watcher.data_dragon.versions_all()[0]
-runes = data_watcher.data_dragon.runes_reforged(version=VERSION)
+    data_watcher = LolWatcher(key) 
+VERSION = data_watcher.data_dragon.versions_all()[0]  # this returns the last version of the patch
+runes = data_watcher.data_dragon.runes_reforged(version=VERSION)  
 items = data_watcher.data_dragon.items(version=VERSION)
-
+print(VERSION)
 
 class Canvas:
     image_pos_map = {
@@ -53,11 +53,11 @@ class Canvas:
     runes = data_watcher.data_dragon.runes_reforged(version=VERSION)
     items = data_watcher.data_dragon.items(version=VERSION)
     spells = data_watcher.data_dragon.summoner_spells(version=VERSION)['data']
-
-    base_path = './img/'
-    background_path = r"./background.png"
-    items_path = './' + VERSION + '/img/item/'
-    spells_path = os.path.join(VERSION,'img','spell')
+    print(spells)
+    base_path = '../img/'
+    background_path = r"../img/background.png"
+    items_path = base_path + 'dragontail-'+ VERSION + '/' + VERSION + '/img/item/'
+    spells_path = base_path + 'dragontail-'+ VERSION + '/' + VERSION + '/img/spell/'
     print(spells_path)
     print('yes')
     def __init__(self, mythic, core, final, primary_runes, secondary_runes, champion, starter, boots, spell1, spell2):
@@ -102,11 +102,11 @@ class Canvas:
                 for rune in row:
                     if self.primary_runes[sloth] == rune['id']:
                         if sloth > 0:
-                            rune_img = Image.open(Canvas.base_path + rune['icon'])
+                            rune_img = Image.open(Canvas.base_path + f'dragontail-{VERSION}/img/'+ rune['icon'])
                             rune_img = rune_img.resize(size=(150, 150))
                             self.canvas.paste(rune_img, Canvas.image_pos_map[sloth], mask=rune_img)
                         else:
-                            rune_img = Image.open(Canvas.base_path + rune['icon'])
+                            rune_img = Image.open(Canvas.base_path + f'dragontail-{VERSION}/img/'+ rune['icon'])
                             self.canvas.paste(rune_img, Canvas.image_pos_map[sloth], mask=rune_img)
 
 
@@ -121,7 +121,7 @@ class Canvas:
         secondary_keystone = Canvas.primary_map[secondary_keystone]
 
         print(secondary_keystone)
-        secondary_key_image = Image.open(Canvas.base_path + Canvas.runes[secondary_keystone]['icon'])
+        secondary_key_image = Image.open(Canvas.base_path + f'dragontail-{VERSION}/img/'+ Canvas.runes[secondary_keystone]['icon'])
         secondary_key_image = secondary_key_image.resize(size=(150, 150))
         self.canvas.paste(secondary_key_image, (300, 50), mask=secondary_key_image)
         for sloth in range(4):
@@ -129,11 +129,11 @@ class Canvas:
                 row = Canvas.runes[secondary_keystone]['slots'][sloth]['runes']
                 for rune in row:
                     if self.secondary_runes[0] == rune['id']:
-                        rune_img = Image.open(Canvas.base_path + rune['icon'])
+                        rune_img = Image.open(Canvas.base_path + f'dragontail-{VERSION}/img/' + rune['icon'])
                         rune_img = rune_img.resize(size=(150, 150))
                         self.canvas.paste(rune_img, Canvas.sec_pos_map[sloth], mask=rune_img)
                     elif self.secondary_runes[1] == rune['id']:
-                        rune_img = Image.open(Canvas.base_path + rune['icon'])
+                        rune_img = Image.open(Canvas.base_path + f'dragontail-{VERSION}/img/' + rune['icon'])
                         rune_img = rune_img.resize(size=(150, 150))
                         self.canvas.paste(rune_img, Canvas.sec_pos_map[sloth], mask=rune_img)
 
@@ -171,21 +171,27 @@ class Canvas:
 
     def find_spells(self):
         size = ((180, 180))
+        img1Done = False
+        img2Done = False
+        
         for summoner in self.spells:
-            if self.spells[summoner]['key'] == str(self.spell1):
+            
+            if self.spells[summoner]['key'] == str(self.spell1 ) and not img1Done:
                 print(summoner)
                 spell1_img = Image.open(os.path.join(self.spells_path,self.spells[summoner]['image']['full']))
+                img1Done = True
 
-            elif self.spells[summoner]['key'] == str(self.spell2):
+            elif self.spells[summoner]['key'] == str(self.spell2) and not img2Done:
                 spell2_img = Image.open(os.path.join(self.spells_path, self.spells[summoner]['image']['full']))
+                img2Done = False
 
         spell1_img = spell1_img.resize(size=size)
         spell2_img = spell2_img.resize(size=size)
         self.canvas.paste(spell1_img, (1210, 445))
         self.canvas.paste(spell2_img, (1430, 445))
-# photo = Canvas(6630,[3053, 3065],[3075, 6333, 3143],[8010, 9111, 9104, 8299],[8304, 8410], 1, False)
-# photo.find_runes()
 
-# photo.find_items()
-# photo.canvas.save('template.png')
-# photo.canvas.show()
+photo = Canvas(6655, [4628, 4645], [3157, 3041, 3165], [8369, 8304, 8345, 8347], [8226, 8237],101, [3850, 2003, 2003], 3020, 4, 3) #summoners should be decreasing order
+
+photo.make_image()
+photo.canvas.save('template.png')
+photo.canvas.show()

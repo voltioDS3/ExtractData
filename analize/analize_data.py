@@ -6,19 +6,22 @@ import json
 import sys, getopt
 
 # --- Global Declaration --- #
-VERSION = '11.14.1'
+with open('../api_key.txt', 'r') as f:
+    key = f.readlines()
+    data_watcher = LolWatcher(key) 
+VERSION = data_watcher.data_dragon.versions_all()[0]
 
 # DELETE THIS PIECE OF CODE AFTER TESTING
 # euw = pd.read_csv('EUW1_DATA.csv')
 # na = pd.read_csv('NA1_DATA.csv')
 # kr = pd.read_csv('KR_DATA.csv')
 # result = [euw, na, kr]
-# df = pd.concat(result)
+
 # DELETE THIS PIECE OF CODE AFTER TESTING
 
 # gets the api key(which in this case is not that important since we will use it only for getting the datadragon
 # information which can be accessed without a key
-with open('api_key.txt', 'r') as f:
+with open('../api_key.txt', 'r') as f:
     key = f.readlines()
     data_watcher = LolWatcher(key)
 
@@ -635,9 +638,14 @@ class ChampionBuild:
         self.get_starters()  # starter check
         self.get_spells(spell1, spell2)
 
-        return self.mythic, self.core, self.final, self.starter, self.boots, self.primary_runes, self.secondary_runes, self.spell1, self.spell2, self.champion_name
+        return self.mythic, self.core, self.final, self.primary_runes, self.secondary_runes, self.starter, self.boots, self.spell1, self.spell2, self.champion_name
 
-# all_matches = ChampionData(df)
-# annie_mid_matches = all_matches.champion_data(2)
-# annie_mid = ChampionBuild(annie_mid_matches)
-# annie_mid.get_all_data()
+# TEST AREA THESE LINES ARE ONLY FOR  TESTING
+
+df = pd.read_csv('../na1_data/na1_data.csv')
+all_matches = ChampionData(df)
+annie_mid_matches = all_matches.champion_data(101)
+annie_mid = ChampionBuild(annie_mid_matches)
+print(annie_mid.get_all_data())
+
+# TEST AREA THESE LINES ARE ONLY FOR  TESTING
