@@ -638,14 +638,14 @@ class ChampionBuild:
         self.get_starters()  # starter check
         self.get_spells(spell1, spell2)
 
-        return self.mythic, self.core, self.final, self.primary_runes, self.secondary_runes, self.starter, self.boots, self.spell1, self.spell2, self.champion_name
+        return self.mythic, self.core, self.final, self.starter, self.boots, self.primary_runes, self.secondary_runes, self.spell1, self.spell2, self.champion_name
 
 # TEST AREA THESE LINES ARE ONLY FOR  TESTING
 
-df = pd.read_csv('../na1_data/na1_data.csv')
-all_matches = ChampionData(df)
-annie_mid_matches = all_matches.champion_data(101)
-annie_mid = ChampionBuild(annie_mid_matches)
-print(annie_mid.get_all_data())
+# df = pd.read_csv('../na1_data/na1_data.csv')
+# all_matches = ChampionData(df)
+# annie_mid_matches = all_matches.champion_data(101)
+# annie_mid = ChampionBuild(annie_mid_matches)
+# print(annie_mid.get_all_data())
 
 # TEST AREA THESE LINES ARE ONLY FOR  TESTING

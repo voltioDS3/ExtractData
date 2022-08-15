@@ -193,8 +193,8 @@ class Canvas:
         self.canvas.paste(spell1_img, (1210, 445))
         self.canvas.paste(spell2_img, (1430, 445))
 
-photo = Canvas(6655, [4628, 4645], [3157, 3041, 3165], [8369, 8304, 8345, 8347], [8226, 8237],101, [3850, 2003, 2003], 3020, 4, 3) #summoners should be decreasing order
+# photo = Canvas(6655, [4628, 4645], [3157, 3041, 3165], [8369, 8304, 8345, 8347], [8226, 8237],101, [3850, 2003, 2003], 3020, 4, 3) #summoners should be decreasing order
 
-photo.make_image()
-photo.canvas.save('template.png')
-photo.canvas.show()
+# photo.make_image()
+# photo.canvas.save('template.png')
+# photo.canvas.show()

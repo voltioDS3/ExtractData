@@ -1,5 +1,6 @@
 *_data/
 __pycache__/
+.vscode/
 img/
 analize/all_info/
 api_key.txt
