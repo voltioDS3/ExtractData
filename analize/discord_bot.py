@@ -323,5 +323,7 @@ async def ai(ctx, champion, aux=None, aux1=None):
             file = check_img(aux, aux1)
             await ctx.send(file=discord.File(file))
 
-
-client.run('ODQ3NDQ3ODQxMjM2MzIwMjU3.YK-NTg.8tuP_8K9qmRmC9kelmZ-Qiqwg2Y')
+with open('./discordToken.txtt', 'r') as f:
+    token = f.readlines()
+    
+client.run(token)
